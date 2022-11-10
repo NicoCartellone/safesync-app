@@ -77,10 +77,11 @@ const Necesidades = ({ navigation }) => {
               >
                 <View style={{ paddingHorizontal: 50 }}>
                   <Text style={styles.textFlatList}>{item.categoria}</Text>
+                  <Text style={styles.textFlatList}>{item.descripcion}</Text>
                 </View>
                 <View style={{ flexDirection: "column-reverse" }}>
                   <Text style={styles.textFlatList}>{item.fecha}</Text>
-                  <Image source={userImg} style={{ width: 50, height: 50 }} />
+                  <Image source={userImg} style={{ width: 40, height: 40 }} />
                 </View>
               </View>
               <Divider />

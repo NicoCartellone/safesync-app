@@ -2,31 +2,27 @@ import { StatusBar } from "expo-status-bar";
 import { View, Text, StyleSheet } from "react-native";
 import { useFirestore } from "../hook/useFirestore";
 import MapHome from "../components/MapHome";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const Home = () => {
-  const { getAllHeatmap, heatmap, loading, error } = useFirestore();
+  const {
+    getAllAlertasNaranjas,
+    getAllAlertasRojas,
+    alertasNaranjas,
+    alertasRojas,
+    loading,
+    error,
+  } = useFirestore();
 
   useEffect(() => {
-    getAllHeatmap();
+    getAllAlertasRojas();
+    getAllAlertasNaranjas();
   }, []);
 
-  if (loading.getAllAlertas)
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#263248",
-        }}
-      >
-        <Text style={{ color: "white" }}>Cargando mapa...</Text>
-      </View>
-    );
+  const isLoading = loading.getAllAlertasRojas && loading.getAllAlertasNaranjas;
 
-  if (error)
-    return (
+  return useMemo(() => {
+    return error ? (
       <View
         style={{
           flex: 1,
@@ -37,13 +33,34 @@ const Home = () => {
       >
         <Text>{error}</Text>
       </View>
+    ) : isLoading ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#263248",
+        }}
+      >
+        <Text style={{ color: "white" }}>Cargando mapa...</Text>
+      </View>
+    ) : (
+      <View style={styles.container}>
+        <StatusBar />
+        <MapHome
+          alertasRojas={alertasRojas}
+          alertasNaranjas={alertasNaranjas}
+        />
+      </View>
     );
-  return (
-    <View style={styles.container}>
-      <StatusBar />
-      <MapHome points={heatmap} />
-    </View>
-  );
+  }, [
+    getAllAlertasNaranjas,
+    getAllAlertasRojas,
+    alertasNaranjas,
+    alertasRojas,
+    loading,
+    error,
+  ]);
 };
 export default Home;
 

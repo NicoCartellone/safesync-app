@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import Constants from "expo-constants";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SelectList from "react-native-dropdown-select-list";
@@ -7,13 +13,14 @@ import { useFirestore } from "../hook/useFirestore";
 
 const CrearNecesidad = ({ navigation }) => {
   const [selected, setSelected] = useState("");
+  const [descripcion, setDescripcion] = useState("");
 
   const { addNecesidad } = useFirestore();
 
   const data = [{ value: "Problema" }, { value: "Conexion barrial" }];
 
   const handleSubmit = () => {
-    addNecesidad(selected);
+    addNecesidad(selected, descripcion);
     navigation.reset({
       index: 1,
       routes: [{ name: "Necesidades" }],
@@ -29,7 +36,7 @@ const CrearNecesidad = ({ navigation }) => {
         <MaterialCommunityIcons
           name="arrow-left"
           color={"#EDF2F4"}
-          size={30}
+          size={40}
         ></MaterialCommunityIcons>
       </TouchableOpacity>
       <Text style={styles.textTitle}>Crear Necesidad</Text>
@@ -46,6 +53,21 @@ const CrearNecesidad = ({ navigation }) => {
           placeholder="Seleccione la categoria"
           search={false}
           dropdownStyles={{ backgroundColor: "white" }}
+        />
+        <TextInput
+          style={{
+            padding: 10,
+            width: "75%",
+            marginTop: 20,
+            borderRadius: 15,
+            backgroundColor: "#EDEDED",
+          }}
+          multiline={true}
+          numberOfLines={4}
+          placeholder="Ingrese la descripcion de su necesidad"
+          placeholderTextColor="black"
+          onChangeText={setDescripcion}
+          value={descripcion}
         />
         <View style={{ padding: 10, alignItems: "center" }}>
           {selected == "" ? (

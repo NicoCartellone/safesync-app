@@ -28,7 +28,7 @@ const formularioScheme = Yup.object().shape({
 const FormRegister = () => {
   const { registerUser } = useContext(UserContext);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     registerUser(values.email, values.password, values.nombreCompleto);
   };
 

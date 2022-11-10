@@ -24,38 +24,40 @@ const CrearAlerta = ({ navigation }) => {
         <MaterialCommunityIcons
           name="arrow-left"
           color={"#EDF2F4"}
-          size={26}
+          size={40}
         ></MaterialCommunityIcons>
       </TouchableOpacity>
       <Text style={styles.textTitle}>Crear alerta de seguridad</Text>
-      <Text style={styles.textChangeBtn}>Elejir alerta roja o naranja</Text>
-      <View
-        style={{
-          flexDirection: "row",
-        }}
-      >
-        <TouchableOpacity
+      <View style={{ bottom: 50 }}>
+        <Text style={styles.textChangeBtn}>Elegir alerta roja o naranja</Text>
+        <View
           style={{
-            padding: 10,
-            backgroundColor: "#DF0E01",
-            margin: 10,
-            borderRadius: 10,
+            flexDirection: "row",
           }}
-          onPress={() => setChangeForm(true)}
         >
-          <Text style={{ color: "white" }}>Alerta Roja</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            padding: 10,
-            backgroundColor: "#DCAE56",
-            margin: 10,
-            borderRadius: 10,
-          }}
-          onPress={() => setChangeForm(false)}
-        >
-          <Text style={{ color: "black" }}>Alerta Naranja</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              backgroundColor: "#DF0E01",
+              margin: 10,
+              borderRadius: 10,
+            }}
+            onPress={() => setChangeForm(true)}
+          >
+            <Text style={{ color: "white" }}>Alerta Roja</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              backgroundColor: "#DCAE56",
+              margin: 10,
+              borderRadius: 10,
+            }}
+            onPress={() => setChangeForm(false)}
+          >
+            <Text style={{ color: "black" }}>Alerta Naranja</Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <View>{changeForm ? <FormAlertaRoja /> : <FormAlertaNaranja />}</View>
     </View>
@@ -129,5 +131,6 @@ const styles = StyleSheet.create({
   },
   textChangeBtn: {
     color: "white",
+    textAlign: "center",
   },
 });

@@ -13,6 +13,7 @@ import { getDoc, setDoc, doc } from "firebase/firestore/lite";
 import { ToastAndroid } from "react-native";
 
 import { erroresFirebase } from "../utils/firebaseErrors";
+import { getToken } from "../utils/notifications";
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(false);
@@ -42,6 +43,7 @@ const UserProvider = ({ children }) => {
         email,
         password
       );
+      const token = await getToken();
       const docRef = doc(db, "users", user.uid);
       const docSpan = await getDoc(docRef);
       if (docSpan.exists()) {
@@ -52,6 +54,7 @@ const UserProvider = ({ children }) => {
           uid: user.uid,
           displayName: nombre,
           photoURL: user.photoURL,
+          token: token,
         });
         setUser(true);
         setUserData({
@@ -59,6 +62,7 @@ const UserProvider = ({ children }) => {
           uid: user.uid,
           displayName: nombre,
           photoURL: user.photoURL,
+          token: token,
         });
       }
     } catch (error) {

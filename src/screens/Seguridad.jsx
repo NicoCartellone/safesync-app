@@ -77,12 +77,35 @@ const Seguridad = ({ navigation }) => {
                   }}
                 >
                   <View style={{ paddingHorizontal: 50 }}>
-                    <Text style={styles.textFlatList}>{item.categoria}</Text>
-                    <Text style={styles.textFlatList}>{item.tipo}</Text>
+                    {item.tipo == "roja" ? (
+                      <Text
+                        style={{
+                          backgroundColor: "red",
+                          color: "white",
+                          borderRadius: 10,
+                          padding: 5,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {item.categoria}
+                      </Text>
+                    ) : (
+                      <Text
+                        style={{
+                          backgroundColor: "orange",
+                          color: "black",
+                          borderRadius: 10,
+                          padding: 5,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {item.categoria}
+                      </Text>
+                    )}
                   </View>
                   <View style={{ flexDirection: "column-reverse" }}>
                     <Text style={styles.textFlatList}>{item.fecha}</Text>
-                    <Image source={userImg} style={{ width: 50, height: 50 }} />
+                    <Image source={userImg} style={{ width: 40, height: 40 }} />
                   </View>
                 </View>
                 <Divider />

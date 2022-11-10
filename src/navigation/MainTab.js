@@ -40,7 +40,7 @@ const MainTab = () => {
                 options={{
                     tabBarLabel: 'Seguridad',
                     tabBarIcon: ({ color }) => {
-                        return <MaterialCommunityIcons name="plus-circle-outline" size={26} color={color}></MaterialCommunityIcons>
+                        return <MaterialCommunityIcons name="shield-home" size={25} color={color}></MaterialCommunityIcons>
                     }
                 }}
             />

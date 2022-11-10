@@ -1,9 +1,8 @@
 import MapView, { Heatmap } from "react-native-maps";
 import { StyleSheet } from "react-native";
+import { useMemo } from "react";
 
-const MapHome = ({ points }) => {
-  const puntosMapa = points;
-
+const MapHome = ({ alertasRojas, alertasNaranjas }) => {
   const puntos = [
     {
       latitude: -34.59568986845935,
@@ -26,20 +25,35 @@ const MapHome = ({ points }) => {
     colors: ["orange"],
     startPoints: [0.07],
   };
-  return (
-    <MapView
-      style={styles.map}
-      initialRegion={{
-        latitude: -34.59568986845935,
-        longitude: -58.444114961826585,
-        latitudeDelta: 0.09,
-        longitudeDelta: 0.04,
-      }}
-    >
-      <Heatmap points={puntosMapa} radius={20} gradient={alertaNaranja} />
-      <Heatmap points={puntos} radius={20} gradient={alertaRoja} />
-    </MapView>
-  );
+  return useMemo(() => {
+    return (
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: -34.59568986845935,
+          longitude: -58.444114961826585,
+          latitudeDelta: 0.09,
+          longitudeDelta: 0.04,
+        }}
+        provider="google"
+      >
+        {alertasNaranjas ? (
+          <Heatmap
+            points={alertasNaranjas}
+            radius={20}
+            gradient={alertaNaranja}
+          />
+        ) : (
+          <Heatmap points={puntos} radius={20} gradient={alertaNaranja} />
+        )}
+        {alertasRojas ? (
+          <Heatmap points={alertasRojas} radius={20} gradient={alertaRoja} />
+        ) : (
+          <Heatmap points={puntos} radius={20} gradient={alertaNaranja} />
+        )}
+      </MapView>
+    );
+  }, [alertasRojas, alertasNaranjas, alertaRoja, alertaNaranja]);
 };
 export default MapHome;
 

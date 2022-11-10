@@ -8,7 +8,8 @@ import { ToastAndroid } from "react-native";
 export const useFirestore = () => {
 
     const [alertas, setAlertas] = useState([])
-    const [heatmap, setHeatmap] = useState([])
+    const [alertasRojas, setAlertasRojas] = useState([])
+    const [alertasNaranjas, setAlertasNaranjas] = useState([])
     const [necesidades, setNecesidades] = useState([])
     const [users, setUsers] = useState([])
     const [error, setError] = useState()
@@ -59,28 +60,43 @@ export const useFirestore = () => {
         }
     }
 
-    const getAllHeatmap = async () => {
+    const getAllAlertasRojas = async () => {
         try {
-            setLoading(prev => ({ ...prev, getAllAlertas: true }))
-            const querySnapshot = await getDocs(collection(db, "alertasMapa"))
+            setLoading(prev => ({ ...prev, getAllAlertasRojas: true }))
+            const querySnapshot = await getDocs(collection(db, "alertasRojas"))
             const dataDB = querySnapshot.docs.map(doc => ({ ...doc.data() }))
-            setHeatmap(dataDB)
+            setAlertasRojas(dataDB)
         } catch (error) {
             console.log(error)
             setError(error.message)
         } finally {
-            setLoading(prev => ({ ...prev, getAllAlertas: false }))
+            setLoading(prev => ({ ...prev, getAllAlertasRojas: false }))
         }
     }
 
-    const addNecesidad = async (categoria) => {
+    const getAllAlertasNaranjas = async () => {
+        try {
+            setLoading(prev => ({ ...prev, getAllAlertasNaranjas: true }))
+            const querySnapshot = await getDocs(collection(db, "alertasNaranjas"))
+            const dataDB = querySnapshot.docs.map(doc => ({ ...doc.data() }))
+            setAlertasNaranjas(dataDB)
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, getAllAlertasNaranjas: false }))
+        }
+    }
+
+    const addNecesidad = async (categoria, descripcion) => {
         try {
             setLoading(prev => ({ ...prev, addNecesidad: true }))
             const collectionRef = collection(db, "necesidades")
             const payload = {
                 categoria: categoria,
                 userid: auth.currentUser.uid,
-                fecha: now
+                fecha: now,
+                descripcion: descripcion
             }
             const docRef = await addDoc(collectionRef, payload)
             const id = docRef.id
@@ -118,10 +134,10 @@ export const useFirestore = () => {
         }
     }
 
-    const addHeatmap = async (lat, long) => {
+    const addAlertaRoja = async (lat, long) => {
         try {
-            setLoading(prev => ({ ...prev, addHeatmap: true }))
-            const collectionRef = collection(db, "alertasMapa")
+            setLoading(prev => ({ ...prev, addAlertaRoja: true }))
+            const collectionRef = collection(db, "alertasRojas")
             const payload = {
                 latitude: lat,
                 longitude: long
@@ -129,13 +145,34 @@ export const useFirestore = () => {
             const docRef = await addDoc(collectionRef, payload)
             const id = docRef.id
             const newPayload = ({ ...payload, id })
-            setHeatmap([newPayload, ...heatmap])
+            setAlertasRojas([newPayload, ...alertasRojas])
             ToastAndroid.show("Alerta creada", ToastAndroid.LONG)
         } catch (error) {
             console.log(error)
             setError(error.message)
         } finally {
-            setLoading(prev => ({ ...prev, addHeatmap: false }))
+            setLoading(prev => ({ ...prev, addAlertaRoja: false }))
+        }
+    }
+
+    const addAlertaNaranja = async (lat, long) => {
+        try {
+            setLoading(prev => ({ ...prev, addAlertaNaranja: true }))
+            const collectionRef = collection(db, "alertasNaranjas")
+            const payload = {
+                latitude: lat,
+                longitude: long
+            }
+            const docRef = await addDoc(collectionRef, payload)
+            const id = docRef.id
+            const newPayload = ({ ...payload, id })
+            setAlertasNaranjas([newPayload, ...alertasNaranjas])
+            ToastAndroid.show("Alerta creada", ToastAndroid.LONG)
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, addAlertaNaranja: false }))
         }
     }
 
@@ -145,13 +182,16 @@ export const useFirestore = () => {
         error,
         loading,
         users,
-        heatmap,
+        alertasRojas,
+        alertasNaranjas,
         getAllAlertas,
         getAllNecesidades,
         getAllUsers,
-        getAllHeatmap,
+        getAllAlertasNaranjas,
+        getAllAlertasRojas,
         addNecesidad,
         addAlerta,
-        addHeatmap,
+        addAlertaRoja,
+        addAlertaNaranja
     }
 }
