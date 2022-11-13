@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.safesync"
@@ -26,11 +24,21 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#263248"
       },
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDb6AHLxe_nQlRi8sv5bN-h4L6mL3ssa44"
+        }
+      },
       "package": "com.safesync",
       "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b55cf2ed-2145-471a-9a46-0f68a18eaf5e"
+      }
     }
   }
 }

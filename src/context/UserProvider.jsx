@@ -1,11 +1,8 @@
 import { createContext, useState, useEffect } from "react";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   onAuthStateChanged,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { auth, db } from "../firebase";
@@ -17,21 +14,22 @@ import { getToken } from "../utils/notifications";
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(false);
-  const [userData, setUserData] = useState({});
+  const [userData, setUserData] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setUser(true);
-        setUserData({
-          email: user.email,
-          uid: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        });
+        const getData = await getUserDocument(user);
+        if (getData) {
+          setUser(true);
+          setUserData(getData);
+          setLoading(false);
+        }
       } else {
         setUser(false);
-        setUserData({});
+        setUserData(false);
+        setLoading(false);
       }
     });
   }, [user]);
@@ -86,38 +84,6 @@ const UserProvider = ({ children }) => {
     ToastAndroid.show("Sesión Cerrada", ToastAndroid.LONG);
   };
 
-  const GoogleSignIn = async () => {
-    try {
-      const provider = new GoogleAuthProvider();
-      const { user } = await signInWithPopup(auth, provider);
-      const docRef = doc(db, "users", user.uid);
-      const docSpan = await getDoc(docRef);
-      if (docSpan.exists()) {
-        setUserData({ ...docSpan.data() });
-      } else {
-        await setDoc(docRef, {
-          email: user.email,
-          uid: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        });
-        setUser(true);
-        setUserData({
-          email: user.email,
-          uid: user.uid,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const ResetPassword = async () => {
-    await sendPasswordResetEmail(auth, auth.currentUser.email);
-  };
-
   return (
     <UserContext.Provider
       value={{
@@ -126,10 +92,9 @@ const UserProvider = ({ children }) => {
         registerUser,
         loginUser,
         signOutUser,
-        GoogleSignIn,
         userData,
         setUserData,
-        ResetPassword,
+        loading,
       }}
     >
       {children}
@@ -139,3 +104,16 @@ const UserProvider = ({ children }) => {
 export default UserProvider;
 
 export const UserContext = createContext();
+
+const getUserDocument = async (user) => {
+  if (!user.uid) return null;
+  try {
+    const docRef = doc(db, "users", user.uid);
+    const userDocument = await getDoc(docRef).then((doc) => {
+      return doc.data();
+    });
+    return userDocument;
+  } catch (error) {
+    console.error("Error fetching user", error);
+  }
+};

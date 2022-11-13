@@ -7,7 +7,7 @@ import {
   Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFirestore } from "../hook/useFirestore";
 import userImg from "../../assets/userImg.png";
 import Divider from "../components/Divider";
@@ -19,22 +19,10 @@ const Necesidades = ({ navigation }) => {
     getAllNecesidades();
   }, []);
 
-  if (loading.getAllNecesidades)
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#263248",
-        }}
-      >
-        <Text style={{ color: "white" }}>Cargando datos...</Text>
-      </View>
-    );
+  const isLoading = loading.getAllNecesidades;
 
-  if (error)
-    return (
+  return useMemo(() => {
+    return error ? (
       <View
         style={{
           flex: 1,
@@ -45,52 +33,62 @@ const Necesidades = ({ navigation }) => {
       >
         <Text>{error}</Text>
       </View>
-    );
-
-  return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
-      <View style={{ alignItems: "center" }}>
-        <Text style={styles.textTitle}>Necesidades</Text>
-        <TouchableOpacity
-          style={styles.btnAlerta}
-          onPress={() => navigation.navigate("CrearNecesidad")}
-        >
-          <Text style={styles.text}>Agregar una necesidad</Text>
-        </TouchableOpacity>
+    ) : isLoading ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#263248",
+        }}
+      >
+        <Text style={{ color: "white" }}>Cargando datos...</Text>
       </View>
-      <View style={{ height: "80%" }}>
-        <FlatList
-          data={necesidades}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View>
-              <View
-                style={{
-                  flex: 2,
-                  flexDirection: "row-reverse",
-                  alignItems: "center",
-                  justifyContent: "flex-end",
-                  marginVertical: 10,
-                  marginRight: 30,
-                }}
-              >
-                <View style={{ paddingHorizontal: 50 }}>
-                  <Text style={styles.textFlatList}>{item.categoria}</Text>
-                  <Text style={styles.textFlatList}>{item.descripcion}</Text>
+    ) : (
+      <View style={styles.container}>
+        <StatusBar style="light" />
+        <View style={{ alignItems: "center" }}>
+          <Text style={styles.textTitle}>Necesidades</Text>
+          <TouchableOpacity
+            style={styles.btnAlerta}
+            onPress={() => navigation.navigate("CrearNecesidad")}
+          >
+            <Text style={styles.text}>Agregar una necesidad</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ height: "80%" }}>
+          <FlatList
+            data={necesidades}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <View>
+                <View
+                  style={{
+                    flex: 2,
+                    flexDirection: "row-reverse",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    marginVertical: 10,
+                    marginRight: 30,
+                  }}
+                >
+                  <View style={{ paddingHorizontal: 50 }}>
+                    <Text style={styles.textFlatList}>{item.categoria}</Text>
+                    <Text style={styles.textFlatList}>{item.descripcion}</Text>
+                  </View>
+                  <View style={{ flexDirection: "column-reverse" }}>
+                    <Text style={styles.textFlatList}>{item.fecha}</Text>
+                    <Image source={userImg} style={{ width: 40, height: 40 }} />
+                  </View>
                 </View>
-                <View style={{ flexDirection: "column-reverse" }}>
-                  <Text style={styles.textFlatList}>{item.fecha}</Text>
-                  <Image source={userImg} style={{ width: 40, height: 40 }} />
-                </View>
+                <Divider />
               </View>
-              <Divider />
-            </View>
-          )}
-        />
+            )}
+          />
+        </View>
       </View>
-    </View>
-  );
+    );
+  }, [getAllNecesidades, necesidades, loading, error]);
 };
 export default Necesidades;
 

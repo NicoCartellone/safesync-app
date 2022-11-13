@@ -34,7 +34,7 @@ export const getToken = async () => {
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
     } else {
-        alert('Must use physical device for Push Notifications');
+        console.log('Must use physical device for Push Notifications');
     }
 
     return token;

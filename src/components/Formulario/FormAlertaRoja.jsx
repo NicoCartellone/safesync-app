@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity, Modal } from "react-native";
 import SelectList from "react-native-dropdown-select-list";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useFirestore } from "../../hook/useFirestore.js";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MapView, { Marker } from "react-native-maps";
@@ -9,13 +9,26 @@ import {
   sendPushNotification,
   setNotificationMessage,
 } from "../../utils/notifications.js";
+import { UserContext } from "../../context/UserProvider";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 
 const FormAlertaRoja = () => {
+  const initialValues = {
+    latitude: -34.59568986845935,
+    longitude: -58.444114961826585,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  };
   const [selected, setSelected] = useState("");
   const [showModal, setShowModal] = useState("");
-  const [newLocation, setNewLocation] = useState({});
+  const [newLocation, setNewLocation] = useState(initialValues);
+  const [saveNewLocation, setSaveNewLocation] = useState({});
 
-  const { addAlerta, addAlertaRoja, getAllUsers, users } = useFirestore();
+  const { userData } = useContext(UserContext);
+
+  const { addAlerta, getAllUsers, users } = useFirestore();
+
+  const nombre = userData.displayName;
 
   useEffect(() => {
     getAllUsers();
@@ -39,9 +52,18 @@ const FormAlertaRoja = () => {
   ];
 
   const handleSubmit = () => {
-    addAlerta(selected, "roja");
-    addAlertaRoja(newLocation.latitude, newLocation.longitude);
+    addAlerta(
+      selected,
+      "Roja",
+      saveNewLocation.latitude,
+      saveNewLocation.longitude,
+      nombre
+    );
     sendNotification();
+  };
+
+  const handleLocationSubmit = () => {
+    setSaveNewLocation(newLocation);
   };
 
   const sendNotification = async () => {
@@ -108,30 +130,65 @@ const FormAlertaRoja = () => {
             alignItems: "center",
           }}
         >
+          <GooglePlacesAutocomplete
+            placeholder="Escribe la ubicación"
+            enablePoweredByContainer={false}
+            fetchDetails={true}
+            onPress={(data, details = null) => {
+              // 'details' is provided when fetchDetails = true
+              setNewLocation({
+                latitude: details.geometry.location.lat,
+                longitude: details.geometry.location.lng,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+              });
+            }}
+            query={{
+              key: "AIzaSyBawHzXYjCT-6GOmeX7hyIxVVB3FJxnts8",
+              language: "es",
+            }}
+            styles={{
+              container: {
+                display: "flex",
+                position: "absolute",
+                zIndex: 100,
+                width: "90%",
+                top: 30,
+              },
+              listView: { backgroundColor: "white" },
+            }}
+          />
           <View
             style={{ height: "75%", width: "90%", backgroundColor: "#fff" }}
           >
             <MapView
               style={{ width: "100%", height: "100%" }}
               initialRegion={{
-                latitude: -34.59568986845935,
-                longitude: -58.444114961826585,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
+                latitude: newLocation.latitude,
+                longitude: newLocation.longitude,
+                latitudeDelta: newLocation.latitudeDelta,
+                longitudeDelta: newLocation.latitudeDelta,
+              }}
+              region={{
+                latitude: newLocation.latitude,
+                longitude: newLocation.longitude,
+                latitudeDelta: newLocation.latitudeDelta,
+                longitudeDelta: newLocation.latitudeDelta,
               }}
             >
               <Marker
                 draggable
-                isPreselected={true}
                 coordinate={{
-                  latitude: -34.59568986845935,
-                  longitude: -58.444114961826585,
-                }}
-                onDragStart={(e) => {
-                  setNewLocation(e.nativeEvent.coordinate);
+                  latitude: newLocation.latitude,
+                  longitude: newLocation.longitude,
                 }}
                 onDragEnd={(e) => {
-                  setNewLocation(e.nativeEvent.coordinate);
+                  setNewLocation({
+                    latitude: e.nativeEvent.coordinate.latitude,
+                    longitude: e.nativeEvent.coordinate.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                  });
                 }}
               />
             </MapView>
@@ -149,10 +206,7 @@ const FormAlertaRoja = () => {
             </TouchableOpacity>
             <View style={{ alignItems: "center" }}>
               <TouchableOpacity
-                onPress={() => {
-                  setShowModal(false);
-                  ToastAndroid.show("Ubicacion guardada", ToastAndroid.LONG);
-                }}
+                onPress={handleLocationSubmit}
                 style={styles.btnModalConfirmarUbicacion}
               >
                 <Text style={{ color: "white" }}>Guardar ubicación</Text>

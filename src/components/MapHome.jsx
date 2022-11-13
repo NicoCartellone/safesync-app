@@ -1,8 +1,8 @@
-import MapView, { Heatmap } from "react-native-maps";
+import MapView, { Heatmap, Marker } from "react-native-maps";
 import { StyleSheet } from "react-native";
 import { useMemo } from "react";
 
-const MapHome = ({ alertasRojas, alertasNaranjas }) => {
+const MapHome = ({ alertas }) => {
   const puntos = [
     {
       latitude: -34.59568986845935,
@@ -16,15 +16,6 @@ const MapHome = ({ alertasRojas, alertasNaranjas }) => {
     },
   ];
 
-  const alertaRoja = {
-    colors: ["red"],
-    startPoints: [0.07],
-  };
-
-  const alertaNaranja = {
-    colors: ["orange"],
-    startPoints: [0.07],
-  };
   return useMemo(() => {
     return (
       <MapView
@@ -37,23 +28,29 @@ const MapHome = ({ alertasRojas, alertasNaranjas }) => {
         }}
         provider="google"
       >
-        {alertasNaranjas ? (
-          <Heatmap
-            points={alertasNaranjas}
-            radius={20}
-            gradient={alertaNaranja}
-          />
-        ) : (
-          <Heatmap points={puntos} radius={20} gradient={alertaNaranja} />
-        )}
-        {alertasRojas ? (
-          <Heatmap points={alertasRojas} radius={20} gradient={alertaRoja} />
-        ) : (
-          <Heatmap points={puntos} radius={20} gradient={alertaNaranja} />
+        {alertas && (
+          <>
+            {alertas.map((marker) => (
+              <Marker
+                key={marker.id}
+                coordinate={{
+                  latitude: marker.latitude,
+                  longitude: marker.longitude,
+                }}
+                title={`Alerta ${marker.tipo}`}
+                description={marker.categoria}
+                image={
+                  marker.tipo === "Roja"
+                    ? require("../../assets/rojo.png")
+                    : require("../../assets/naranja.png")
+                }
+              />
+            ))}
+          </>
         )}
       </MapView>
     );
-  }, [alertasRojas, alertasNaranjas, alertaRoja, alertaNaranja]);
+  }, [alertas]);
 };
 export default MapHome;
 

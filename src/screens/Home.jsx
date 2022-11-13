@@ -5,21 +5,13 @@ import MapHome from "../components/MapHome";
 import { useEffect, useMemo } from "react";
 
 const Home = () => {
-  const {
-    getAllAlertasNaranjas,
-    getAllAlertasRojas,
-    alertasNaranjas,
-    alertasRojas,
-    loading,
-    error,
-  } = useFirestore();
+  const { getAllAlertas, alertas, loading, error } = useFirestore();
 
   useEffect(() => {
-    getAllAlertasRojas();
-    getAllAlertasNaranjas();
+    getAllAlertas();
   }, []);
 
-  const isLoading = loading.getAllAlertasRojas && loading.getAllAlertasNaranjas;
+  const isLoading = loading.getAllAlertas;
 
   return useMemo(() => {
     return error ? (
@@ -47,20 +39,10 @@ const Home = () => {
     ) : (
       <View style={styles.container}>
         <StatusBar />
-        <MapHome
-          alertasRojas={alertasRojas}
-          alertasNaranjas={alertasNaranjas}
-        />
+        <MapHome alertas={alertas} />
       </View>
     );
-  }, [
-    getAllAlertasNaranjas,
-    getAllAlertasRojas,
-    alertasNaranjas,
-    alertasRojas,
-    loading,
-    error,
-  ]);
+  }, [getAllAlertas, alertas, loading, error]);
 };
 export default Home;
 
