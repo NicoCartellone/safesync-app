@@ -7,10 +7,11 @@ import {
 } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { getDoc, setDoc, doc } from "firebase/firestore/lite";
-import { ToastAndroid } from "react-native";
 
 import { erroresFirebase } from "../utils/firebaseErrors";
 import { getToken } from "../utils/notifications";
+
+import Toast from "react-native-root-toast";
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(false);
@@ -65,23 +66,23 @@ const UserProvider = ({ children }) => {
       }
     } catch (error) {
       const { message } = erroresFirebase(error.code);
-      ToastAndroid.show(message, ToastAndroid.LONG);
+      Toast.show(message);
     }
   };
 
   const loginUser = async (email, password) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      ToastAndroid.show("Bienvenido, Sesión Iniciada", ToastAndroid.LONG);
+      Toast.show("Bienvenido, Sesión Iniciada");
     } catch (error) {
       const { message } = erroresFirebase(error.code);
-      ToastAndroid.show(message, ToastAndroid.LONG);
+      Toast.show(message);
     }
   };
 
   const signOutUser = () => {
     signOut(auth);
-    ToastAndroid.show("Sesión Cerrada", ToastAndroid.LONG);
+    Toast.show("Sesión Cerrada");
   };
 
   return (

@@ -27,7 +27,12 @@
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyDb6AHLxe_nQlRi8sv5bN-h4L6mL3ssa44"
-        }
+        },
+        "permissions": [
+          "LOCATION",
+          "ACCESS_COARSE_LOCATION",
+          "ACCESS_FINE_LOCATION"
+        ]
       },
       "package": "com.safesync",
       "versionCode": 1

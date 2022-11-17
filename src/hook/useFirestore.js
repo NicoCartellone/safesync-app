@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { db, auth } from '../firebase'
-import { addDoc, collection, deleteDoc, getDocs, query, where, doc, updateDoc } from "firebase/firestore/lite"
-import { ToastAndroid } from "react-native";
+import { addDoc, collection, getDocs, query, updateDoc, where, doc } from "firebase/firestore/lite"
+import Toast from "react-native-root-toast";
 
 
 
@@ -10,6 +10,7 @@ export const useFirestore = () => {
     const [alertas, setAlertas] = useState([])
     const [necesidades, setNecesidades] = useState([])
     const [users, setUsers] = useState([])
+    const [alertXuser, setAlertXuser] = useState([])
     const [error, setError] = useState()
     const [loading, setLoading] = useState({})
 
@@ -58,6 +59,39 @@ export const useFirestore = () => {
         }
     }
 
+    const getAlertXuser = async () => {
+        try {
+            setLoading(prev => ({ ...prev, getAlertXuser: true }))
+            const dataRef = collection(db, `alertas`)
+            const q = query(dataRef, where("userid", "==", auth.currentUser.uid))
+            const querySnapshot = await getDocs(q)
+            const dataDB = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            setAlertXuser(dataDB)
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, getAlertXuser: false }))
+        }
+    }
+
+    const updateAddLike = async (id, likeNumber) => {
+        const likeRes = likeNumber + 1
+        const dataRef = doc(db, "necesidades", id)
+        await updateDoc(dataRef, {
+            like: likeRes
+        })
+    }
+
+    const updateSubLike = async (id, likeNumber) => {
+        const likeRes = likeNumber - 1
+        const dataRef = doc(db, "necesidades", id)
+        await updateDoc(dataRef, {
+            like: likeRes
+        })
+    }
+
+
     const addNecesidad = async (categoria, descripcion) => {
         try {
             setLoading(prev => ({ ...prev, addNecesidad: true }))
@@ -66,13 +100,14 @@ export const useFirestore = () => {
                 categoria: categoria,
                 userid: auth.currentUser.uid,
                 fecha: now,
-                descripcion: descripcion
+                descripcion: descripcion,
+                like: 0
             }
             const docRef = await addDoc(collectionRef, payload)
             const id = docRef.id
             const newPayload = ({ ...payload, id })
             setNecesidades([newPayload, ...necesidades])
-            ToastAndroid.show("Necesidad creada", ToastAndroid.LONG)
+            Toast.show("Necesidad creada")
         } catch (error) {
             console.log(error)
             setError(error.message)
@@ -98,7 +133,7 @@ export const useFirestore = () => {
             const id = docRef.id
             const newPayload = ({ ...payload, id })
             setAlertas([newPayload, ...alertas])
-            ToastAndroid.show("Alerta creada", ToastAndroid.LONG)
+            Toast.show("Alerta creada")
         } catch (error) {
             console.log(error)
             setError(error.message)
@@ -113,9 +148,13 @@ export const useFirestore = () => {
         error,
         loading,
         users,
+        alertXuser,
+        updateAddLike,
+        updateSubLike,
         getAllAlertas,
         getAllNecesidades,
         getAllUsers,
+        getAlertXuser,
         addNecesidad,
         addAlerta,
     }

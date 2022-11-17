@@ -4,13 +4,15 @@ import { useEffect, useState, useContext } from "react";
 import { useFirestore } from "../../hook/useFirestore.js";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MapView, { Marker } from "react-native-maps";
-import { ToastAndroid } from "react-native";
+import Toast from "react-native-root-toast";
 import {
   sendPushNotification,
   setNotificationMessage,
 } from "../../utils/notifications.js";
 import { UserContext } from "../../context/UserProvider";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import { getCurrentLocation } from "../../utils/locations";
+import * as Location from "expo-location";
 
 const FormAlertaRoja = () => {
   const initialValues = {
@@ -23,6 +25,7 @@ const FormAlertaRoja = () => {
   const [showModal, setShowModal] = useState("");
   const [newLocation, setNewLocation] = useState(initialValues);
   const [saveNewLocation, setSaveNewLocation] = useState({});
+  const [adressText, setAdressText] = useState("");
 
   const { userData } = useContext(UserContext);
 
@@ -32,6 +35,12 @@ const FormAlertaRoja = () => {
 
   useEffect(() => {
     getAllUsers();
+    (async () => {
+      const response = await getCurrentLocation();
+      if (response.status) {
+        setNewLocation(response.location);
+      }
+    })();
   }, []);
 
   const handleToken = () => {
@@ -62,8 +71,9 @@ const FormAlertaRoja = () => {
     sendNotification();
   };
 
-  const handleLocationSubmit = () => {
+  const handleLocationSubmit = async () => {
     setSaveNewLocation(newLocation);
+    Toast.show("Alerta roja guardada");
   };
 
   const sendNotification = async () => {
@@ -73,7 +83,7 @@ const FormAlertaRoja = () => {
         const messageNotification = setNotificationMessage(
           userToken,
           `Alerta Roja`,
-          selected,
+          `${selected} en ${adressText}`,
           { data: `Data de prueba` }
         );
         await sendPushNotification(messageNotification);
@@ -135,6 +145,7 @@ const FormAlertaRoja = () => {
             enablePoweredByContainer={false}
             fetchDetails={true}
             onPress={(data, details = null) => {
+              setAdressText(data.structured_formatting.main_text);
               // 'details' is provided when fetchDetails = true
               setNewLocation({
                 latitude: details.geometry.location.lat,
@@ -182,13 +193,19 @@ const FormAlertaRoja = () => {
                   latitude: newLocation.latitude,
                   longitude: newLocation.longitude,
                 }}
-                onDragEnd={(e) => {
+                onDragEnd={async (e) => {
                   setNewLocation({
                     latitude: e.nativeEvent.coordinate.latitude,
                     longitude: e.nativeEvent.coordinate.longitude,
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                   });
+                  const res = await Location.reverseGeocodeAsync({
+                    latitude: e.nativeEvent.coordinate.latitude,
+                    longitude: e.nativeEvent.coordinate.longitude,
+                  });
+                  const address = `${res[0].street} ${res[0].streetNumber}`;
+                  setAdressText(address);
                 }}
               />
             </MapView>

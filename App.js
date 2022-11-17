@@ -3,6 +3,7 @@ import MainStack from "./src/navigation/MainStack.jsx";
 import UserProvider from "./src/context/UserProvider.jsx";
 
 import { startNotifications } from "./src/utils/notifications.js";
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 export default function App() {
   const notificationListener = useRef()
@@ -14,9 +15,11 @@ export default function App() {
 
 
   return (
-    <UserProvider>
-      <MainStack />
-    </UserProvider>
+    <RootSiblingParent>
+      <UserProvider>
+        <MainStack />
+      </UserProvider>
+    </RootSiblingParent>
   );
 }
 

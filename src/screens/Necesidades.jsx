@@ -7,19 +7,39 @@ import {
   Image,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFirestore } from "../hook/useFirestore";
 import userImg from "../../assets/userImg.png";
 import Divider from "../components/Divider";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import TimeAgo from "@andordavoti/react-native-timeago";
 
 const Necesidades = ({ navigation }) => {
-  const { getAllNecesidades, necesidades, loading, error } = useFirestore();
+  const [isPress, setIsPress] = useState(false);
+  const {
+    getAllNecesidades,
+    necesidades,
+    loading,
+    error,
+    updateAddLike,
+    updateSubLike,
+  } = useFirestore();
 
   useEffect(() => {
     getAllNecesidades();
   }, []);
 
   const isLoading = loading.getAllNecesidades;
+
+  const handleLikeAdd = (item) => {
+    setIsPress(!isPress);
+    updateAddLike(item.id, item.like);
+  };
+
+  const handleLikeSub = (item) => {
+    setIsPress(!isPress);
+    updateSubLike(item.id, item.like);
+  };
 
   return useMemo(() => {
     return error ? (
@@ -67,17 +87,52 @@ const Necesidades = ({ navigation }) => {
                     flex: 2,
                     flexDirection: "row-reverse",
                     alignItems: "center",
-                    justifyContent: "flex-end",
-                    marginVertical: 10,
+                    justifyContent: "space-around",
+                    marginTop: 30,
+                    marginBottom: 15,
                     marginRight: 30,
                   }}
                 >
                   <View style={{ paddingHorizontal: 50 }}>
-                    <Text style={styles.textFlatList}>{item.categoria}</Text>
-                    <Text style={styles.textFlatList}>{item.descripcion}</Text>
+                    <Text style={styles.textTitleFlatList}>
+                      {item.categoria}
+                    </Text>
+                    <Text style={styles.textBodyFlatList}>
+                      {item.descripcion}
+                    </Text>
+                    {isPress ? (
+                      <TouchableOpacity
+                        style={{ marginTop: 5 }}
+                        onPress={() => handleLikeAdd(item)}
+                      >
+                        <MaterialCommunityIcons
+                          name="thumb-up-outline"
+                          color="white"
+                          size={20}
+                        />
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        style={{ marginTop: 5 }}
+                        onPress={() => handleLikeSub(item)}
+                      >
+                        <MaterialCommunityIcons
+                          name="thumb-up-outline"
+                          color="#aeaeae"
+                          size={20}
+                        />
+                      </TouchableOpacity>
+                    )}
+
+                    <Text style={{ color: "white", fontSize: 10 }}>
+                      {item.like}
+                    </Text>
                   </View>
                   <View style={{ flexDirection: "column-reverse" }}>
-                    <Text style={styles.textFlatList}>{item.fecha}</Text>
+                    <TimeAgo
+                      style={styles.textBodyFlatList}
+                      dateTo={new Date(item.fecha)}
+                    />
                     <Image source={userImg} style={{ width: 40, height: 40 }} />
                   </View>
                 </View>
@@ -88,7 +143,7 @@ const Necesidades = ({ navigation }) => {
         </View>
       </View>
     );
-  }, [getAllNecesidades, necesidades, loading, error]);
+  }, [getAllNecesidades, necesidades, loading, error, isPress]);
 };
 export default Necesidades;
 
@@ -117,8 +172,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
   },
-  textFlatList: {
+  textBodyFlatList: {
+    color: "#C7C7C7",
+    textTransform: "capitalize",
+    fontSize: 10,
+    marginTop: 10,
+  },
+  textTitleFlatList: {
     color: "white",
     textTransform: "capitalize",
+    fontSize: 20,
   },
 });

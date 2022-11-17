@@ -11,6 +11,7 @@ import { useFirestore } from "../hook/useFirestore";
 import { useEffect, useMemo } from "react";
 import userImg from "../../assets/userImg.png";
 import Divider from "../components/Divider";
+import TimeAgo from "@andordavoti/react-native-timeago";
 
 const Seguridad = ({ navigation }) => {
   const { getAllAlertas, alertas, loading, error } = useFirestore();
@@ -70,12 +71,19 @@ const Seguridad = ({ navigation }) => {
                       alignItems: "center",
                       justifyContent: "space-between",
                       marginVertical: 10,
+                      marginHorizontal: 20,
                       marginRight: 30,
                     }}
                   >
                     <View>
                       <View style={{ margin: 10 }}>
-                        <Text style={{ color: "white", textAlign: "center" }}>
+                        <Text
+                          style={{
+                            color: "white",
+                            textAlign: "center",
+                            fontSize: 15,
+                          }}
+                        >
                           {item.nombre} alertó
                         </Text>
                       </View>
@@ -108,7 +116,11 @@ const Seguridad = ({ navigation }) => {
                       </View>
                     </View>
                     <View style={{ flexDirection: "column-reverse" }}>
-                      <Text style={styles.textFlatList}>{item.fecha}</Text>
+                      <TimeAgo
+                        style={styles.textFlatListFecha}
+                        dateTo={new Date(item.fecha)}
+                        hideAgo={false}
+                      />
                       <Image
                         source={userImg}
                         style={{ width: 40, height: 40 }}
@@ -164,8 +176,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 20,
   },
-  textFlatList: {
+  textFlatListFecha: {
     color: "white",
     textTransform: "capitalize",
+    fontSize: 10,
+    textAlign: "center",
   },
 });

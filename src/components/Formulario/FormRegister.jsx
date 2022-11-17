@@ -1,5 +1,5 @@
 import { Formik } from "formik";
-import { TextInput, TouchableOpacity, Text, Alert } from "react-native";
+import { TextInput, TouchableOpacity, Text } from "react-native";
 import Styles from "./FormStyle";
 import * as Yup from "yup";
 import { useContext } from "react";
@@ -9,7 +9,7 @@ const formularioScheme = Yup.object().shape({
   nombreCompleto: Yup.string()
     .required("Campo obligatorio")
     .min(6, "Minimo 6 caracteres")
-    .max(40, "Maximo 40 caracteres"),
+    .max(30, "Maximo 30 caracteres"),
   email: Yup.string()
     .email("Formato de email no valido")
     .trim("No debe contener espacion en blanco")
