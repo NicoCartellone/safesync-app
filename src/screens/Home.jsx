@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { useFirestore } from "../hook/useFirestore";
 import MapHome from "../components/MapHome";
 import { useEffect, useMemo } from "react";
@@ -34,7 +34,8 @@ const Home = () => {
           backgroundColor: "#263248",
         }}
       >
-        <Text style={{ color: "white" }}>Cargando mapa...</Text>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={{ color: "white" }}>Cargando Mapa</Text>
       </View>
     ) : (
       <View style={styles.container}>

@@ -6,7 +6,7 @@ import {
   signOut,
 } from "firebase/auth";
 import { auth, db } from "../firebase";
-import { getDoc, setDoc, doc } from "firebase/firestore/lite";
+import { getDoc, setDoc, doc } from "firebase/firestore";
 
 import { erroresFirebase } from "../utils/firebaseErrors";
 import { getToken } from "../utils/notifications";
@@ -65,6 +65,7 @@ const UserProvider = ({ children }) => {
         });
       }
     } catch (error) {
+      console.log(error);
       const { message } = erroresFirebase(error.code);
       Toast.show(message);
     }

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useContext, useMemo, useEffect } from "react";
 import { UserContext } from "../context/UserProvider";
@@ -47,7 +48,8 @@ const Perfil = () => {
           backgroundColor: "#263248",
         }}
       >
-        <Text style={{ color: "white" }}>Cargando datos...</Text>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={{ color: "white" }}>Cargando Perfil</Text>
       </View>
     ) : (
       <View style={styles.cotainer}>
@@ -83,7 +85,7 @@ const Perfil = () => {
           <Text style={styles.text}>{userData.email}</Text>
         </View>
         <View style={{ height: "75%", marginTop: 30 }}>
-          {alertXuser ? (
+          {alertXuser.categoria ? (
             <FlatList
               data={alertXuser}
               keyExtractor={(item) => item.id}
@@ -138,6 +140,7 @@ const Perfil = () => {
                       <TimeAgo
                         style={styles.textFlatList}
                         dateTo={new Date(item.fecha)}
+                        hideAgo={true}
                       />
                       <Image
                         source={userImg}
@@ -150,8 +153,15 @@ const Perfil = () => {
               )}
             />
           ) : (
-            <View>
-              <Text>Todavia no creaste una alerta</Text>
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#aeaeaa" }}>
+                Todavia no creaste ninguna alerta
+              </Text>
             </View>
           )}
         </View>

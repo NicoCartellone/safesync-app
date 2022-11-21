@@ -58,7 +58,7 @@ const CrearNecesidad = ({ navigation }) => {
           style={{
             padding: 10,
             width: "75%",
-            marginTop: 20,
+            marginTop: 10,
             borderRadius: 15,
             backgroundColor: "#EDEDED",
           }}

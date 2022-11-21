@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { db, auth } from '../firebase'
-import { addDoc, collection, getDocs, query, updateDoc, where, doc } from "firebase/firestore/lite"
+import { addDoc, collection, getDocs, query, updateDoc, where, doc, increment, arrayRemove, setDoc, getDoc, arrayUnion, onSnapshot } from "firebase/firestore"
 import Toast from "react-native-root-toast";
 
 
@@ -34,9 +34,14 @@ export const useFirestore = () => {
     const getAllNecesidades = async () => {
         try {
             setLoading(prev => ({ ...prev, getAllNecesidades: true }))
-            const querySnapshot = await getDocs(collection(db, "necesidades"))
-            const dataDB = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-            setNecesidades(dataDB)
+            const dataRef = collection(db, "necesidades")
+            onSnapshot(dataRef, (querySnapshot) => {
+                const dataDb = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                setNecesidades(dataDb)
+            })
+            // const querySnapshot = await getDocs(collection(db, "necesidades"))
+            // const dataDB = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+            // setNecesidades(dataDB)
         } catch (error) {
             console.log(error)
             setError(error.message)
@@ -75,22 +80,65 @@ export const useFirestore = () => {
         }
     }
 
-    const updateAddLike = async (id, likeNumber) => {
-        const likeRes = likeNumber + 1
-        const dataRef = doc(db, "necesidades", id)
-        await updateDoc(dataRef, {
-            like: likeRes
-        })
+    const addLikeArray = async (id) => {
+        try {
+            setLoading(prev => ({ ...prev, addLikeArray: true }))
+            const docRef = doc(db, "necesidades", id)
+            await updateDoc(docRef, {
+                likes: arrayUnion(auth.currentUser.uid),
+            }, { merge: true })
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, addLikeArray: true }))
+        }
     }
 
-    const updateSubLike = async (id, likeNumber) => {
-        const likeRes = likeNumber - 1
-        const dataRef = doc(db, "necesidades", id)
-        await updateDoc(dataRef, {
-            like: likeRes
-        })
+    const removeLikeArray = async (id) => {
+        try {
+            setLoading(prev => ({ ...prev, removeLikeArray: true }))
+            const docRef = doc(db, "necesidades", id)
+            await updateDoc(docRef, {
+                likes: arrayRemove(auth.currentUser.uid)
+            })
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, removeLikeArray: true }))
+        }
     }
 
+    const updateAddLike = async (id) => {
+        try {
+            setLoading(prev => ({ ...prev, updateAddLike: true }))
+            const dataRef = doc(db, "necesidades", id)
+            await updateDoc(dataRef, {
+                like: increment(1)
+            })
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, updateAddLike: true }))
+        }
+    }
+
+    const updateSubLike = async (id) => {
+        try {
+            setLoading(prev => ({ ...prev, updateSubLike: true }))
+            const dataRef = doc(db, "necesidades", id)
+            await updateDoc(dataRef, {
+                like: increment(-1)
+            })
+        } catch (error) {
+            console.log(error)
+            setError(error.message)
+        } finally {
+            setLoading(prev => ({ ...prev, updateSubLike: true }))
+        }
+    }
 
     const addNecesidad = async (categoria, descripcion) => {
         try {
@@ -101,7 +149,8 @@ export const useFirestore = () => {
                 userid: auth.currentUser.uid,
                 fecha: now,
                 descripcion: descripcion,
-                like: 0
+                like: 0,
+                likes: []
             }
             const docRef = await addDoc(collectionRef, payload)
             const id = docRef.id
@@ -157,5 +206,7 @@ export const useFirestore = () => {
         getAlertXuser,
         addNecesidad,
         addAlerta,
+        addLikeArray,
+        removeLikeArray
     }
 }

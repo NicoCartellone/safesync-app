@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
@@ -13,9 +14,9 @@ import userImg from "../../assets/userImg.png";
 import Divider from "../components/Divider";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import TimeAgo from "@andordavoti/react-native-timeago";
+import { auth } from "../firebase";
 
 const Necesidades = ({ navigation }) => {
-  const [isPress, setIsPress] = useState(false);
   const {
     getAllNecesidades,
     necesidades,
@@ -23,6 +24,8 @@ const Necesidades = ({ navigation }) => {
     error,
     updateAddLike,
     updateSubLike,
+    addLikeArray,
+    removeLikeArray,
   } = useFirestore();
 
   useEffect(() => {
@@ -32,13 +35,13 @@ const Necesidades = ({ navigation }) => {
   const isLoading = loading.getAllNecesidades;
 
   const handleLikeAdd = (item) => {
-    setIsPress(!isPress);
-    updateAddLike(item.id, item.like);
+    addLikeArray(item.id);
+    updateAddLike(item.id);
   };
 
   const handleLikeSub = (item) => {
-    setIsPress(!isPress);
-    updateSubLike(item.id, item.like);
+    removeLikeArray(item.id);
+    updateSubLike(item.id);
   };
 
   return useMemo(() => {
@@ -62,7 +65,8 @@ const Necesidades = ({ navigation }) => {
           backgroundColor: "#263248",
         }}
       >
-        <Text style={{ color: "white" }}>Cargando datos...</Text>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={{ color: "white" }}>Cargando Necesidades</Text>
       </View>
     ) : (
       <View style={styles.container}>
@@ -76,7 +80,8 @@ const Necesidades = ({ navigation }) => {
             <Text style={styles.text}>Agregar una necesidad</Text>
           </TouchableOpacity>
         </View>
-        <View style={{ height: "80%" }}>
+        <View></View>
+        <View style={{ height: "75%", marginTop: 30 }}>
           <FlatList
             data={necesidades}
             keyExtractor={(item) => item.id}
@@ -86,52 +91,62 @@ const Necesidades = ({ navigation }) => {
                   style={{
                     flex: 2,
                     flexDirection: "row-reverse",
+                    justifyContent: "space-between",
                     alignItems: "center",
-                    justifyContent: "space-around",
-                    marginTop: 30,
-                    marginBottom: 15,
-                    marginRight: 30,
+                    marginVertical: 10,
+                    marginHorizontal: 40,
                   }}
                 >
-                  <View style={{ paddingHorizontal: 50 }}>
-                    <Text style={styles.textTitleFlatList}>
-                      {item.categoria}
-                    </Text>
-                    <Text style={styles.textBodyFlatList}>
-                      {item.descripcion}
-                    </Text>
-                    {isPress ? (
-                      <TouchableOpacity
-                        style={{ marginTop: 5 }}
-                        onPress={() => handleLikeAdd(item)}
-                      >
-                        <MaterialCommunityIcons
-                          name="thumb-up-outline"
-                          color="white"
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                    ) : (
-                      <TouchableOpacity
-                        style={{ marginTop: 5 }}
-                        onPress={() => handleLikeSub(item)}
-                      >
-                        <MaterialCommunityIcons
-                          name="thumb-up-outline"
-                          color="#aeaeae"
-                          size={20}
-                        />
-                      </TouchableOpacity>
-                    )}
+                  <View>
+                    <View style={{ margin: 10, alignItems: "flex-end" }}>
+                      <Text style={styles.textTitleFlatList}>
+                        {item.categoria}
+                      </Text>
+                      <Text style={styles.textBodyFlatList}>
+                        {item.descripcion}
+                      </Text>
+                      <View>
+                        {item.likes.indexOf(auth.currentUser.uid) !== -1 ? (
+                          <TouchableOpacity
+                            style={{ marginTop: 5 }}
+                            onPress={() => handleLikeSub(item)}
+                          >
+                            <MaterialCommunityIcons
+                              name="heart"
+                              color="red"
+                              size={20}
+                            />
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            style={{ marginTop: 5 }}
+                            onPress={() => handleLikeAdd(item)}
+                          >
+                            <MaterialCommunityIcons
+                              name="heart"
+                              color="white"
+                              size={20}
+                            />
+                          </TouchableOpacity>
+                        )}
 
-                    <Text style={{ color: "white", fontSize: 10 }}>
-                      {item.like}
-                    </Text>
+                        <Text
+                          style={{
+                            color: "white",
+                            fontSize: 10,
+                            textAlign: "center",
+                          }}
+                        >
+                          {item.like}
+                        </Text>
+                      </View>
+                    </View>
                   </View>
                   <View style={{ flexDirection: "column-reverse" }}>
                     <TimeAgo
                       style={styles.textBodyFlatList}
                       dateTo={new Date(item.fecha)}
+                      hideAgo={true}
                     />
                     <Image source={userImg} style={{ width: 40, height: 40 }} />
                   </View>
@@ -143,7 +158,7 @@ const Necesidades = ({ navigation }) => {
         </View>
       </View>
     );
-  }, [getAllNecesidades, necesidades, loading, error, isPress]);
+  }, [getAllNecesidades, necesidades, loading, error]);
 };
 export default Necesidades;
 
@@ -177,10 +192,21 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     fontSize: 10,
     marginTop: 10,
+    textAlign: "center",
   },
   textTitleFlatList: {
     color: "white",
     textTransform: "capitalize",
     fontSize: 20,
+    textAlign: "center",
+  },
+  btnEncuensta: {
+    alignItems: "center",
+    padding: 5,
+    width: "20%",
+    height: 20,
+    marginTop: 10,
+    borderRadius: 15,
+    backgroundColor: "white",
   },
 });

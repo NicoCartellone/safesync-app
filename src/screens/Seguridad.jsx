@@ -6,6 +6,7 @@ import {
   View,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { useFirestore } from "../hook/useFirestore";
 import { useEffect, useMemo } from "react";
@@ -43,7 +44,8 @@ const Seguridad = ({ navigation }) => {
           backgroundColor: "#263248",
         }}
       >
-        <Text style={{ color: "white" }}>Cargando datos...</Text>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={{ color: "white" }}>Cargando Alertas</Text>
       </View>
     ) : (
       <View style={styles.container}>
@@ -119,7 +121,7 @@ const Seguridad = ({ navigation }) => {
                       <TimeAgo
                         style={styles.textFlatListFecha}
                         dateTo={new Date(item.fecha)}
-                        hideAgo={false}
+                        hideAgo={true}
                       />
                       <Image
                         source={userImg}
