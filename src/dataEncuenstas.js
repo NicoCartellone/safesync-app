@@ -1,22 +1,22 @@
 export const encuestas = [
     {
         id: 1,
-        opinion: "prueba",
-        btn1: "de acuerdo",
-        btn2: "no de acuerdo"
+        opinion: "Prueba",
+        btn1: "De acuerdo",
+        btn2: "No de acuerdo"
     },
 
     {
         id: 2,
-        opinion: "prueba2",
-        btn1: "conforme",
-        btn2: "no conforme"
+        opinion: "Prueba2",
+        btn1: "Conforme",
+        btn2: "No conforme"
     },
 
     {
         id: 3,
-        opinion: "prueba3",
-        btn1: "concuerdo",
-        btn2: "no concuerdo"
+        opinion: "Prueba3",
+        btn1: "Concuerdo",
+        btn2: "No concuerdo"
     }
 ]

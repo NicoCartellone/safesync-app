@@ -6,6 +6,7 @@ import {
   FlatList,
   Image,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useMemo, useState } from "react";
@@ -15,8 +16,10 @@ import Divider from "../components/Divider";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import TimeAgo from "@andordavoti/react-native-timeago";
 import { auth } from "../firebase";
+import { encuestas } from "../dataEncuenstas";
 
 const Necesidades = ({ navigation }) => {
+  const [showModal, setShowModal] = useState("");
   const {
     getAllNecesidades,
     necesidades,
@@ -80,7 +83,89 @@ const Necesidades = ({ navigation }) => {
             <Text style={styles.text}>Agregar una necesidad</Text>
           </TouchableOpacity>
         </View>
-        <View></View>
+        <View
+          style={{
+            justifyContent: "center",
+            marginTop: 20,
+            alignItems: "center",
+          }}
+        >
+          <TouchableOpacity
+            style={styles.btnEncuensta}
+            onPress={() => {
+              setShowModal(true);
+            }}
+          >
+            <Text style={{ fontSize: 10 }}>Encuestas</Text>
+          </TouchableOpacity>
+          <Modal animationType="fade" transparent visible={showModal}>
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "rgba(1,1,1,0.5)",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  height: "80%",
+                  width: "90%",
+                  backgroundColor: "#263248",
+                  alignItems: "center",
+                }}
+              >
+                <FlatList
+                  data={encuestas}
+                  keyExtractor={(item) => item.id}
+                  renderItem={({ item }) => (
+                    <View style={{ marginVertical: 10, width: "100%" }}>
+                      <Text style={{ color: "white", textAlign: "center" }}>
+                        Opiniones sobre {item.opinion}
+                      </Text>
+                      <View
+                        style={{ flexDirection: "row", marginVertical: 20 }}
+                      >
+                        <TouchableOpacity
+                          style={{
+                            backgroundColor: "white",
+                            borderRadius: 15,
+                            padding: 5,
+                          }}
+                        >
+                          <Text>{item.btn1}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={{
+                            marginLeft: 10,
+                            backgroundColor: "white",
+                            borderRadius: 15,
+                            padding: 5,
+                          }}
+                        >
+                          <Text>{item.btn2}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <Divider />
+                    </View>
+                  )}
+                />
+              </View>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                setShowModal(false);
+              }}
+              style={styles.btnModal}
+            >
+              <MaterialCommunityIcons
+                name="arrow-left"
+                color={"black"}
+                size={30}
+              ></MaterialCommunityIcons>
+            </TouchableOpacity>
+          </Modal>
+        </View>
         <View style={{ height: "75%", marginTop: 30 }}>
           <FlatList
             data={necesidades}
@@ -202,11 +287,19 @@ const styles = StyleSheet.create({
   },
   btnEncuensta: {
     alignItems: "center",
-    padding: 5,
-    width: "20%",
-    height: 20,
-    marginTop: 10,
+    padding: 7,
+    width: "30%",
+    height: 30,
     borderRadius: 15,
     backgroundColor: "white",
+  },
+  btnModal: {
+    display: "flex",
+    position: "absolute",
+    zIndex: 100,
+    padding: 5,
+    margin: 10,
+    backgroundColor: "#eaeaea",
+    borderRadius: 60,
   },
 });
